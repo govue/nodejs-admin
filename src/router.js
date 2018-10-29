@@ -2,11 +2,12 @@ import Vue from "vue";
 import Router from "vue-router";
 import Index from "./views/Index.vue";
 import Register from "./views/Register";
+import Login from "./views/Login";
 import NoFound from "./views/404";
 
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
   mode: "history",
   base: process.env.BASE_URL,
   routes: [
@@ -25,6 +26,11 @@ export default new Router({
       component: Register
     },
     {
+      path: "/login",
+      name: "Login",
+      component: Login
+    },
+    {
       path: "*",
       name: "NoFound",
       component: NoFound
@@ -40,3 +46,15 @@ export default new Router({
     }
   ]
 });
+
+// 路由守卫
+router.beforeEach((to, from, next) => {
+  const isLogin = localStorage.eleToken ? true : false
+  if (to.path === '/login' || to.path === '/register') {
+    next()
+  } else {
+    isLogin ? next() : next('/login')
+  }
+})
+
+export default router
