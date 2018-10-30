@@ -1,7 +1,10 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import createLogger from 'vuex/dist/logger' // 当mutations修改state的时候在控制台输出log
 
 Vue.use(Vuex);
+
+const debug = process.env.NODE_ENV !== 'production'
 
 const state = {
   isAuthenticated: false,
@@ -49,5 +52,7 @@ export default new Vuex.Store({
   state,
   getters,
   mutations,
-  actions
+  actions,
+  strict: debug,
+  plugins: debug ? [createLogger()] : []
 });
