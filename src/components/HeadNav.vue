@@ -49,7 +49,9 @@
             break
         }
       },
-      showInfoList() {},
+      showInfoList() {
+          this.$router.push('infoshow')
+      },
       logout() {
         localStorage.removeItem('eleToken') // 清除localStorage中的token
         this.$store.dispatch('clearCurrentState') // 清除vuex中的登录信息
