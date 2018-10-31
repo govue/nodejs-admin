@@ -1,17 +1,20 @@
 <template>
     <div class="index">
         <HeadNav></HeadNav>
+        <LeftMenu></LeftMenu>
         <router-view></router-view>
     </div>
 </template>
 
 <script type="text/ecmascript-6">
     import HeadNav from '../components/HeadNav'
+    import LeftMenu from '../components/LeftMenu'
 
     export default {
       name: "Index",
       components: {
-        HeadNav
+        HeadNav,
+        LeftMenu
       }
     };
 </script>

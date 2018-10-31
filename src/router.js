@@ -31,11 +31,11 @@ const router = new Router({
           name: 'Home',
           component: Home
         },
-          {
-            path: '/infoshow',
-            name: 'InfoShow',
-            component: InfoShow
-          }
+        {
+          path: '/infoshow',
+          name: 'InfoShow',
+          component: InfoShow
+        }
       ]
     },
     {
