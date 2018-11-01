@@ -23,7 +23,7 @@ axios.interceptors.request.use(config => {
   // 如果有eleToken
   if (localStorage.eleToken) {
     // 设置统一的请求header
-    config.headers.Authenticator = localStorage.eleToken
+    config.headers.Authorization = localStorage.eleToken
   }
 
 

@@ -3,6 +3,7 @@ import Router from "vue-router";
 import Index from "./views/Index.vue";
 import Home from "./views/Home";
 import InfoShow from "./views/InfoShow.vue";
+import FundList from "./views/FundList.vue"
 import Register from "./views/Register";
 import Login from "./views/Login";
 import NoFound from "./views/404";
@@ -19,7 +20,7 @@ const router = new Router({
     },
     {
       path: "/index",
-      name: "Index",
+      // name: "Index",
       component: Index,
       children: [
         {
@@ -35,6 +36,11 @@ const router = new Router({
           path: '/infoshow',
           name: 'InfoShow',
           component: InfoShow
+        },
+        {
+          path: '/fundlist',
+          name: 'FundList',
+          component: FundList
         }
       ]
     },
