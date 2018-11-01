@@ -51,7 +51,7 @@
                 </el-table-column>
             </el-table>
         </div>
-        <Dialog :dialog="dialog" @updated="getProfile"></Dialog>
+        <Dialog :dialog="dialog" :formData="formData" @updated="getProfile"></Dialog>
     </div>
 
 </template>
@@ -65,8 +65,19 @@
         data() {
             return {
                 tableData: [],
+                formData: {
+                    type: '',
+                    describe: '',
+                    income: '',
+                    expend: '',
+                    cash: '',
+                    remark: '',
+                    id: ''
+                },
                 dialog: {
-                    show: false
+                    show: false,
+                    title: '添加资金信息',
+                    option: 'edit'
                 }
             }
         },
@@ -86,13 +97,44 @@
                     .catch(err => console.log(err))
             },
             handleAdd() {
-                this.dialog.show = true
+                this.dialog = {
+                    show: true,
+                    title: "添加资金信息",
+                    option: "add"
+                }
+                this.formData = {
+                    type: '',
+                    describe: '',
+                    income: '',
+                    expend: '',
+                    cash: '',
+                    remark: '',
+                    id: ''
+                }
             },
             handleEdit(index, row) {
-                console.log(index)
+                this.dialog = {
+                    show: true,
+                    title: "编辑资金信息",
+                    option: "edit"
+                }
+                this.formData = {
+                    type: row.type,
+                    describe: row.describe,
+                    income: row.income,
+                    expend: row.expend,
+                    cash: row.cash,
+                    remark: row.remark,
+                    id: row._id
+                }
             },
             handleDelete(index, row) {
-                console.log('d')
+                this.$axios.delete(`/api/profiles/delete/${row._id}`)
+                    .then(res => {
+                        this.$message('删除成功')
+                        this.getProfile()
+                    })
+                    .catch(err => console.log(err))
             }
         },
         created() {

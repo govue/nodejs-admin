@@ -1,6 +1,6 @@
 <template>
     <div class="dilog">
-        <el-dialog title="添加资金信息"
+        <el-dialog :title="dialog.title"
                    :visible.sync="dialog.show"
                    :close-on-click-modal="false"
                    :modal-append-to-body="false"
@@ -47,19 +47,11 @@
     export default {
         name: 'Dialog',
         props: {
-            dialog: Object
+            dialog: Object,
+            formData: Object
         },
         data() {
             return {
-                formData: {
-                    type: '',
-                    describe: '',
-                    income: '',
-                    expend: '',
-                    cash: '',
-                    remark: '',
-                    id: ''
-                },
                 formartTypeList: [
                     'aaa', 'bbb', 'ccc'
                 ],
@@ -77,7 +69,8 @@
             onSubmit(form) {
                 this.$refs[form].validate(valid => {
                     if (valid) {
-                        this.$axios.post("/api/profiles/add", this.formData)
+                        const url = this.dialog.option === 'add' ? 'add' : `edit/${this.formData.id}`
+                        this.$axios.post(`/api/profiles/${url}`, this.formData)
                             .then(res => {
                                 this.$message({
                                     message: '添加成功',
