@@ -36,7 +36,7 @@
                 </el-table-column>
                 <el-table-column prop="cash" label="帐户现金" align="center" width="100"></el-table-column>
                 <el-table-column prop="remark" label="备注" align="center" width="100"></el-table-column>
-                <el-table-column prop="operation" label="操作" width="180" fixed="right">
+                <el-table-column prop="operation" label="操作" width="" fixed="right">
                     <template slot-scope="scope">
                         <el-button
                                 size="small"
@@ -50,6 +50,21 @@
                     </template>
                 </el-table-column>
             </el-table>
+            <el-row>
+                <el-col :span="24">
+                    <div class="pagination">
+                        <el-pagination
+                                :page-sizes="paginations.page_sizes"
+                                :page-size="paginations.page_size"
+                                :layout="paginations.layout"
+                                :total="paginations.total"
+                                :current-page.sync='paginations.page_index'
+                                @current-change='handleCurrentChange'
+                                @size-change='handleSizeChange'>
+                        </el-pagination>
+                    </div>
+                </el-col>
+            </el-row>
         </div>
         <Dialog :dialog="dialog" :formData="formData" @updated="getProfile"></Dialog>
     </div>
@@ -65,6 +80,7 @@
         data() {
             return {
                 tableData: [],
+                allTableData: [],
                 formData: {
                     type: '',
                     describe: '',
@@ -74,6 +90,13 @@
                     remark: '',
                     id: ''
                 },
+              paginations: {
+                page_index: 1, // 当前位于哪页
+                total: 0, // 总数
+                page_size: 5, // 1页显示多少条
+                page_sizes: [5, 10, 15, 20], //每页显示多少条
+                layout: "total, sizes, prev, pager, next, jumper" // 翻页属性
+              },
                 dialog: {
                     show: false,
                     title: '添加资金信息',
@@ -92,7 +115,9 @@
                 // 获取表格数据
                 this.$axios.get("/api/profiles")
                     .then(res => {
-                        this.tableData = res.data
+                        this.allTableData = res.data
+                      // 设置分页数据
+                      this.setPaginations()
                     })
                     .catch(err => console.log(err))
             },
@@ -135,7 +160,33 @@
                         this.getProfile()
                     })
                     .catch(err => console.log(err))
+            },
+          handleSizeChange(page_size) {
+            this.paginations.page_index = 1
+            this.paginations.page_size = page_size
+            this.tableData = this.allTableData.filter((item, index) => {
+              return index < this.paginations.page_size
+            })
+          },
+          handleCurrentChange(page) {
+            let index = this.paginations.page_size * (page -1) // 计算要跳转前的初始值
+            let nums = this.paginations.page_size * page // 跳转页最大数据
+            let tables = []
+            for (let i = index; i < nums; i++) {
+              if (this.allTableData[i]) {
+                tables.push(this.allTableData[i]) // 将跳转的页数据遍历出来
+              }
+              this.tableData = tables
             }
+          },
+          setPaginations() {
+              this.paginations.total = this.allTableData.length
+              // this.paginations.page_index = 1
+              // this.paginations.page_size = 5
+              this.tableData = this.allTableData.filter((item, index) => {
+                return index < this.paginations.page_size
+              })
+          }
         },
         created() {
             this.getProfile()
@@ -153,4 +204,7 @@
     box-sizing: border-box
 .btnRight
     float: right
+.pagination
+    text-align: right
+    padding-top: 10px
 </style>
