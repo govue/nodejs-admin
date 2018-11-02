@@ -1,9 +1,30 @@
 <template>
     <div class="fill-container">
         <div>
-            <el-form :inline="true" ref="add_data">
+            <el-form :inline="true" ref="add_data" :model="search_data">
+                <el-form-item label="按时间筛选">
+                    <el-date-picker
+                            v-model="search_data.start_time"
+                            type="datetime"
+                            placeholder="选择开始时间"
+                    >
+                    </el-date-picker> --
+                    <el-date-picker
+                            v-model="search_data.end_time"
+                            type="datetime"
+                            placeholder="选择结束时间"
+                    >
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" size="small" icon="search" @click="handleSearch()">筛选</el-button>
+                </el-form-item>
                 <el-form-item class="btnRight">
-                    <el-button type="primary" size="small" icon="view" @click="handleAdd()">添加</el-button>
+                    <el-button type="primary"
+                               v-if="user.identity=='manage'"
+                               size="small" icon="view"
+                               @click="handleAdd()"
+                    >添加</el-button>
                 </el-form-item>
             </el-form>
         </div>
@@ -46,6 +67,7 @@
                                 size="small"
                                 icon="delete"
                                 type="danger"
+                                v-if="user.identity=='manage'"
                                 @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                     </template>
                 </el-table-column>
@@ -79,8 +101,8 @@
         props: {},
         data() {
             return {
-                tableData: [],
-                allTableData: [],
+                tableData: [], // 用于显示用的数据
+                allTableData: [], // 所有的数据，显示前的数据
                 formData: {
                     type: '',
                     describe: '',
@@ -97,6 +119,11 @@
                 page_sizes: [5, 10, 15, 20], //每页显示多少条
                 layout: "total, sizes, prev, pager, next, jumper" // 翻页属性
               },
+                search_data: {
+                    start_time : '',
+                    end_time: ''
+                },
+                filterTableData: [],
                 dialog: {
                     show: false,
                     title: '添加资金信息',
@@ -104,7 +131,11 @@
                 }
             }
         },
-        computed: {},
+        computed: {
+            user() {
+                return this.$store.getters.user
+            }
+        },
         watch: {},
         components: {
             Dialog
@@ -116,6 +147,7 @@
                 this.$axios.get("/api/profiles")
                     .then(res => {
                         this.allTableData = res.data
+                        this.filterTableData = res.data // 时间筛选用
                       // 设置分页数据
                       this.setPaginations()
                     })
@@ -186,7 +218,30 @@
               this.tableData = this.allTableData.filter((item, index) => {
                 return index < this.paginations.page_size
               })
-          }
+          },
+            handleSearch() {
+                if (!this.search_data.start_time || !this.search_data.end_time) {
+                    this.$message({
+                        type: 'warning',
+                        message: '请选择时间区间'
+                    })
+                    this.getProfile()
+                    return
+                }
+
+                const sTime = this.search_data.start_time.getTime()
+                const eTime = this.search_data.end_time.getTime()
+
+
+                this.allTableData = this.filterTableData.filter(item => {
+                    let date = new Date(item.date)
+                    let time = date.getTime()
+                    return time >= sTime && time <= eTime
+                })
+
+                // 分页数据
+                this.setPaginations()
+            }
         },
         created() {
             this.getProfile()
